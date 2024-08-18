@@ -1,4 +1,22 @@
 <script setup lang="ts">
+
+import {type ModelResponse} from "ollama/browser";
+
+const ollama = useOllama()
+
+const models = ref<ModelResponse[]>([])
+
+const fetchModels = async () => {
+  models.value = (await ollama.list()).models
+  console.log(models.value)
+}
+
+fetchModels()
+
+const formatDateTimeToLocaleString = (date: string) => {
+  return (new Date(date)).toLocaleDateString() + ' ' + (new Date(date)).toLocaleTimeString()
+}
+
 </script>
 
 <template>
@@ -18,6 +36,21 @@
     </ULandingCard>
     <ULandingCard title="Backend demo" class="col-span-6" to="/backend">
       Demo of a live chat application using Nuxt-Ollama on the backend.
+    </ULandingCard>
+    <ULandingCard title="Models Installed" class="col-span-12">
+      <div  class="flex justify-between">
+        <strong>Model Name</strong>
+        <strong>Model Familly & parameter size</strong>
+        <strong>Last modified</strong>
+      </div>
+      <div v-for="(model, index) in models" :key="'model'+index">
+        <div  class="flex justify-between">
+          <p>{{ model.name }}</p>
+          <p>{{model.details.family}} {{model.details.parameter_size}}</p>
+          <p>{{formatDateTimeToLocaleString(model.modified_at.toString())}}</p>
+        </div>
+        <hr>
+      </div>
     </ULandingCard>
   </ULandingGrid>
 </template>
